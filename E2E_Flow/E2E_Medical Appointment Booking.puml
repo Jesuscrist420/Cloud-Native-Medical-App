@@ -1,0 +1,36 @@
+@startuml
+title End-to-End Flow: Medical Appointment Booking
+
+actor Patient
+participant "Frontend (Web/App)" as FE
+participant "API Gateway" as API
+participant "Calendar Service (Cloud SQL)" as CAL
+participant "Payment Service (Cloud SQL)" as PAY
+participant "Notification Service (Firestore)" as NOTI
+participant "Teleconsultation Service (Token Manager)" as TELE
+
+== Appointment Booking ==
+Patient -> FE: Request appointment slot
+FE -> API: Create appointment (patientId, doctorId, slot)
+API -> CAL: Verify slot availability
+CAL --> API: Slot available (lock slot)
+API --> FE: Appointment reserved
+
+== Optional Payment ==
+Patient -> FE: Initiate payment
+FE -> API: Send payment details
+API -> PAY: Process payment (amount, method)
+PAY --> API: Payment success/failure
+API --> FE: Payment status
+
+== Confirmation ==
+API -> NOTI: Create confirmation notification
+NOTI --> Patient: Appointment confirmation (push/email/SMS)
+
+== Teleconsultation ==
+API -> TELE: Request teleconsultation token
+TELE --> API: Return secure token
+API --> FE: Token delivered
+Patient -> FE: Join teleconsultation with token
+
+@enduml
