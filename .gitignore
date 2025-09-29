@@ -5,6 +5,10 @@ dist/
 .env
 .env.*
 
+# Block accidental JS artifacts in src
+**/src/**/*.js
+**/src/**/*.js.map
+
 # macOS
 .DS_Store
 
