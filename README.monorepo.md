@@ -4,7 +4,7 @@ This monorepo scaffolds 7 microservices, a shared package, and Terraform IaC for
 
 - Services: auth, appointments, payments, notifications, reporting, patients, doctors
 - Event Bus: Google Pub/Sub (topics & subscriptions)
-- Databases: Cloud SQL (PostgreSQL) with 1 DB per service
+- Databases: Cloud SQL (PostgreSQL), Buckets and Firestore
 - Language: Node.js + TypeScript
 
 ## Local development
@@ -16,6 +16,6 @@ This monorepo scaffolds 7 microservices, a shared package, and Terraform IaC for
 
 - packages/common: shared types & Pub/Sub helpers
 - services/*: individual microservices
-- infra/: Terraform for Pub/Sub and Cloud SQL
+- infra/: Terraform for IaC
 
 More docs will be added as we implement each component.

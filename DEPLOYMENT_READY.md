@@ -19,12 +19,19 @@
 
 ### 2. Database Architecture
 ✅ **Auth Service** → Firestore (Native Mode)
+
 ✅ **Appointments Service** → Cloud SQL (PostgreSQL)
+
 ✅ **Payments Service** → Cloud SQL (PostgreSQL)
+
 ✅ **Notifications Service** → No database (stateless, event-driven)
+
 ✅ **Patients Service** → Firestore + Cloud Storage bucket
+
 ✅ **Doctors Service** → Firestore + Cloud Storage bucket
+
 ✅ **Reporting Service** → Cloud Storage bucket only
+
 
 ### 3. Observability & Monitoring (Complete)
 ✅ **Cloud Logging**
@@ -58,8 +65,11 @@
 
 ### 5. Deployment Scripts
 ✅ **pre-deploy-check.sh** - Validates prerequisites
+
 ✅ **deploy.sh** - Automated deployment (builds + infrastructure)
+
 ✅ **update-postman.sh** - Updates Postman collection with URLs
+
 ✅ **health-check.sh** - Verifies all services are healthy
 
 ### 6. Testing & Documentation

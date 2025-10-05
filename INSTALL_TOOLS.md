@@ -5,7 +5,7 @@
 I've created a script that automatically installs Terraform and jq for you:
 
 ```bash
-cd "/Users/jesquino/JesusQ/UN/Semestre 10/Diplomado Arquitectura /Modulo 1 Arquitectura de Software Basada en la  nube/Project/Cloud-Native-Medical-App"
+cd "Cloud-Native-Medical-App"
 
 # Run the installation script
 ./install-tools.sh
