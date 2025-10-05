@@ -407,8 +407,8 @@ resource "google_cloud_run_v2_service" "appointments" {
       
       startup_probe {
         initial_delay_seconds = 10
-        timeout_seconds       = 10
-        period_seconds        = 5
+        timeout_seconds       = 3
+        period_seconds        = 10
         failure_threshold     = 10
         tcp_socket {
           port = 8080
@@ -482,8 +482,8 @@ resource "google_cloud_run_v2_service" "payments" {
       
       startup_probe {
         initial_delay_seconds = 10
-        timeout_seconds       = 10
-        period_seconds        = 5
+        timeout_seconds       = 3
+        period_seconds        = 10
         failure_threshold     = 10
         tcp_socket {
           port = 8080
@@ -558,8 +558,8 @@ resource "google_cloud_run_v2_service" "notifications" {
       
       startup_probe {
         initial_delay_seconds = 10
-        timeout_seconds       = 10
-        period_seconds        = 5
+        timeout_seconds       = 3
+        period_seconds        = 10
         failure_threshold     = 10
         tcp_socket {
           port = 8080
