@@ -322,8 +322,6 @@ This deployment focuses on **backend E2E testing**. The following are NOT includ
 ❌ **SSL Certificates** - Using Cloud Run default SSL  
 ❌ **Custom Domain** - Using default `.run.app` domains  
 ❌ **CI/CD Pipeline** - Manual deployment only  
-❌ **Firestore** - Only Cloud SQL deployed  
-❌ **Cloud Storage** - Not deployed  
 
 ### To Add Database Schema:
 
