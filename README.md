@@ -4,6 +4,17 @@
 
 Before running any deployment commands, complete these steps:
 
+### ✅ Step 0: Install Required Tools
+
+**If you don't have Terraform and jq installed:**
+
+```bash
+# Automated installation (no Homebrew needed)
+./install-tools.sh
+```
+
+📖 **Alternative methods**: See [INSTALL_TOOLS.md](INSTALL_TOOLS.md) for manual installation
+
 ### ✅ Step 1: Run Pre-Deployment Validation
 ```bash
 ./pre-deploy-check.sh
