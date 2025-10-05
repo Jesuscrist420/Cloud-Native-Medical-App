@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { EventBus, EventSchemas } from '@app/common';
 import { PostgresAppointmentRepository } from './repository.js';
 import { z } from 'zod';
@@ -22,6 +23,15 @@ const UpdateStatusSchema = z.object({
 
 async function main() {
   const app = express();
+  
+  // CORS configuration - Allow requests from frontend
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+  
   app.use(express.json());
 
   // Initialize repository with database connection
@@ -159,7 +169,7 @@ async function main() {
   });
 
   // Health check with database validation
-  app.get('/healthz', async (_req, res) => {
+  app.get('/appointments/healthz', async (_req, res) => {
     const dbHealthy = await repository.healthCheck();
     if (!dbHealthy) {
       return res.status(503).json({ ok: false, error: 'Database unhealthy' });

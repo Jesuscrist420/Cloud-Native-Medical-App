@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { FirestoreDoctorRepository } from './repository.js';
 import { z } from 'zod';
 
@@ -27,6 +28,15 @@ const UpdateDoctorSchema = z.object({
 
 async function main() {
   const app = express();
+  
+  // CORS configuration - Allow requests from frontend
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+  
   app.use(express.json());
 
   // Initialize repository
@@ -155,7 +165,7 @@ async function main() {
   });
 
   // Health check
-  app.get('/healthz', async (_req, res) => {
+  app.get('/doctors/healthz', async (_req, res) => {
     const dbHealthy = await repository.healthCheck();
     if (!dbHealthy) {
       return res.status(503).json({ ok: false, error: 'Database unhealthy' });

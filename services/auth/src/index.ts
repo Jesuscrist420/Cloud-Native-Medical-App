@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { FirestoreUserRepository, FirestoreSessionRepository } from './repository.js';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
@@ -23,6 +24,15 @@ const LoginSchema = z.object({
 
 async function main() {
   const app = express();
+  
+  // CORS configuration - Allow requests from frontend
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+  
   app.use(express.json());
 
   // Initialize repositories
@@ -168,7 +178,7 @@ async function main() {
   });
 
   // Health check
-  app.get('/healthz', async (_req, res) => {
+  app.get('/auth/healthz', async (_req, res) => {
     const dbHealthy = await userRepo.healthCheck();
     if (!dbHealthy) {
       return res.status(503).json({ ok: false, error: 'Database unhealthy' });

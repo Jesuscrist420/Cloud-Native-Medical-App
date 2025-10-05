@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { EventBus } from '@app/common';
 
 const PORT = process.env.PORT || 4004;
@@ -19,13 +20,22 @@ const stats = {
 
 async function main() {
   const app = express();
+  
+  // CORS configuration - Allow requests from frontend
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+  
   app.use(express.json());
 
   // Health check
-  app.get('/healthz', (_req, res) => res.json({ ok: true }));
+  app.get('/notifications/healthz', (_req, res) => res.json({ ok: true }));
 
   // Stats endpoint for monitoring
-  app.get('/stats', (_req, res) => res.json({ ok: true, stats }));
+  app.get('/notifications/stats', (_req, res) => res.json({ ok: true, stats }));
 
   // Start HTTP server first to pass health checks
   const server = app.listen(PORT, () => console.log(`🚀 Notifications service on :${PORT}`));
