@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { EventBus } from '@app/common/pubsub.js';
+import { EventBus } from '@app/common';
 
 const PORT = process.env.PORT || 4004;
 const TOPIC = process.env.TOPIC_NOTIFICATIONS || 'notifications';

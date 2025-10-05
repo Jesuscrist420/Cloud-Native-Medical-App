@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { EventBus } from '@app/common/pubsub.js';
+import { EventBus } from '@app/common';
 
 const PORT = process.env.PORT || 4003;
 const TOPIC_PAYMENTS = process.env.TOPIC_PAYMENTS || 'payments';
