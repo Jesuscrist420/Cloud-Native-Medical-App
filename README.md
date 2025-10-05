@@ -58,7 +58,10 @@ This script will verify:
 # 2. Deploy everything (builds containers + infrastructure)
 ./deploy.sh
 
-# 3. Wait 15-25 minutes for completion
+# OR skip container builds if already built
+./deploy.sh --skip-build
+
+# 3. Wait 5-25 minutes for completion (depends on options)
 
 # 4. Update Postman collection with URLs
 ./update-postman.sh
@@ -66,6 +69,13 @@ This script will verify:
 # 5. Verify all services are healthy
 ./health-check.sh
 ```
+
+**Deployment Options:**
+- `./deploy.sh` - Full deployment (~15-25 min): Build all containers + deploy infrastructure
+- `./deploy.sh --skip-build` - Infrastructure only (~5-10 min): Skip container builds, deploy/update infrastructure only
+- `./deploy.sh --help` - Show all available options
+
+📖 See [DEPLOYMENT_OPTIONS.md](DEPLOYMENT_OPTIONS.md) for detailed deployment modes and workflows.
 
 ### Option 2: Manual Step-by-Step
 

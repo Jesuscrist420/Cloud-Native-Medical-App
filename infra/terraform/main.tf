@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.34"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
 
@@ -67,6 +71,50 @@ resource "google_service_account" "runtime" {
   display_name = "Cloud Run runtime SA"
 }
 
+# Grant topic-level publisher permissions
+resource "google_pubsub_topic_iam_member" "appointments_publisher" {
+  project = var.project_id
+  topic   = google_pubsub_topic.appointments.name
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${google_service_account.runtime.email}"
+}
+
+resource "google_pubsub_topic_iam_member" "payments_publisher" {
+  project = var.project_id
+  topic   = google_pubsub_topic.payments.name
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${google_service_account.runtime.email}"
+}
+
+resource "google_pubsub_topic_iam_member" "notifications_publisher" {
+  project = var.project_id
+  topic   = google_pubsub_topic.notifications.name
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${google_service_account.runtime.email}"
+}
+
+# Grant subscription-level subscriber permissions
+resource "google_pubsub_subscription_iam_member" "notifications_service_subscriber" {
+  project      = var.project_id
+  subscription = google_pubsub_subscription.notifications_service.name
+  role         = "roles/pubsub.subscriber"
+  member       = "serviceAccount:${google_service_account.runtime.email}"
+}
+
+resource "google_pubsub_subscription_iam_member" "notifications_from_appointments_subscriber" {
+  project      = var.project_id
+  subscription = google_pubsub_subscription.notifications_from_appointments.name
+  role         = "roles/pubsub.subscriber"
+  member       = "serviceAccount:${google_service_account.runtime.email}"
+}
+
+resource "google_pubsub_subscription_iam_member" "notifications_from_payments_subscriber" {
+  project      = var.project_id
+  subscription = google_pubsub_subscription.notifications_from_payments.name
+  role         = "roles/pubsub.subscriber"
+  member       = "serviceAccount:${google_service_account.runtime.email}"
+}
+
 # Grant Pub/Sub permissions
 resource "google_project_iam_member" "runtime_pubsub_publisher" {
   project = var.project_id
@@ -115,6 +163,28 @@ resource "google_project_iam_member" "runtime_monitoring_writer" {
   member  = "serviceAccount:${google_service_account.runtime.email}"
 }
 
+# Wait for IAM propagation (GCP can take up to 80 seconds)
+resource "time_sleep" "wait_for_iam_propagation" {
+  depends_on = [
+    google_project_iam_member.runtime_pubsub_publisher,
+    google_project_iam_member.runtime_pubsub_subscriber,
+    google_project_iam_member.runtime_sql_client,
+    google_project_iam_member.runtime_firestore_user,
+    google_project_iam_member.runtime_storage_admin,
+    google_project_iam_member.runtime_log_writer,
+    google_project_iam_member.runtime_monitoring_writer,
+    # Topic-level permissions
+    google_pubsub_topic_iam_member.appointments_publisher,
+    google_pubsub_topic_iam_member.payments_publisher,
+    google_pubsub_topic_iam_member.notifications_publisher,
+    # Subscription-level permissions
+    google_pubsub_subscription_iam_member.notifications_service_subscriber,
+    google_pubsub_subscription_iam_member.notifications_from_appointments_subscriber,
+    google_pubsub_subscription_iam_member.notifications_from_payments_subscriber
+  ]
+  create_duration = "90s"
+}
+
 # Grant Cloud Trace permissions
 resource "google_project_iam_member" "runtime_trace_agent" {
   project = var.project_id
@@ -133,7 +203,6 @@ locals {
 locals {
   common_env = [
     { name = "GOOGLE_CLOUD_PROJECT", value = var.project_id },
-    { name = "PORT", value = "8080" },
     { name = "GCP_REGION", value = var.region }
   ]
 }
@@ -163,7 +232,12 @@ resource "google_cloud_run_v2_service" "auth" {
       ports { container_port = 8080 }
     }
   }
-  depends_on = [google_project_service.services, google_firestore_database.auth_db]
+  depends_on = [
+    google_project_service.services,
+    google_firestore_database.auth_db,
+    google_project_iam_member.runtime_firestore_user,
+    google_project_iam_member.runtime_log_writer
+  ]
 }
 
 # Patients Service - Firestore + Cloud Storage
@@ -196,7 +270,13 @@ resource "google_cloud_run_v2_service" "patients" {
       ports { container_port = 8080 }
     }
   }
-  depends_on = [google_project_service.services, google_storage_bucket.patients_bucket]
+  depends_on = [
+    google_project_service.services,
+    google_storage_bucket.patients_bucket,
+    google_project_iam_member.runtime_firestore_user,
+    google_project_iam_member.runtime_storage_admin,
+    google_project_iam_member.runtime_log_writer
+  ]
 }
 
 # Doctors Service - Firestore + Cloud Storage
@@ -229,7 +309,13 @@ resource "google_cloud_run_v2_service" "doctors" {
       ports { container_port = 8080 }
     }
   }
-  depends_on = [google_project_service.services, google_storage_bucket.doctors_bucket]
+  depends_on = [
+    google_project_service.services,
+    google_storage_bucket.doctors_bucket,
+    google_project_iam_member.runtime_firestore_user,
+    google_project_iam_member.runtime_storage_admin,
+    google_project_iam_member.runtime_log_writer
+  ]
 }
 
 # Reporting Service - Cloud Storage only
@@ -257,7 +343,12 @@ resource "google_cloud_run_v2_service" "reporting" {
       ports { container_port = 8080 }
     }
   }
-  depends_on = [google_project_service.services, google_storage_bucket.reporting_bucket]
+  depends_on = [
+    google_project_service.services,
+    google_storage_bucket.reporting_bucket,
+    google_project_iam_member.runtime_storage_admin,
+    google_project_iam_member.runtime_log_writer
+  ]
 }
 
 # Appointments Service - Cloud SQL + Pub/Sub
@@ -313,9 +404,26 @@ resource "google_cloud_run_v2_service" "appointments" {
       }
       
       ports { container_port = 8080 }
+      
+      startup_probe {
+        initial_delay_seconds = 10
+        timeout_seconds       = 10
+        period_seconds        = 5
+        failure_threshold     = 10
+        tcp_socket {
+          port = 8080
+        }
+      }
     }
   }
-  depends_on = [google_project_service.services, google_sql_database.appointments_db]
+  depends_on = [
+    google_project_service.services,
+    google_sql_database.appointments_db,
+    google_project_iam_member.runtime_sql_client,
+    google_project_iam_member.runtime_pubsub_publisher,
+    google_project_iam_member.runtime_log_writer,
+    time_sleep.wait_for_iam_propagation
+  ]
 }
 
 # Payments Service - Cloud SQL + Pub/Sub
@@ -371,10 +479,29 @@ resource "google_cloud_run_v2_service" "payments" {
       }
       
       ports { container_port = 8080 }
+      
+      startup_probe {
+        initial_delay_seconds = 10
+        timeout_seconds       = 10
+        period_seconds        = 5
+        failure_threshold     = 10
+        tcp_socket {
+          port = 8080
+        }
+      }
     }
   }
-  depends_on = [google_project_service.services, google_sql_database.payments_db]
+  depends_on = [
+    google_project_service.services,
+    google_sql_database.payments_db,
+    google_project_iam_member.runtime_sql_client,
+    google_project_iam_member.runtime_pubsub_publisher,
+    google_project_iam_member.runtime_log_writer,
+    time_sleep.wait_for_iam_propagation
+  ]
 }
+
+# Notifications Service - Pub/Sub Consumer
 
 # Notifications Service - No database, Pub/Sub subscriber
 resource "google_cloud_run_v2_service" "notifications" {
@@ -382,7 +509,10 @@ resource "google_cloud_run_v2_service" "notifications" {
   location = var.region
   template {
     service_account = google_service_account.runtime.email
-    scaling { min_instance_count = 1 }
+    scaling { 
+      min_instance_count = 1
+      max_instance_count = 10
+    }
     containers {
       image = "${local.artifact_repo}/notifications:latest"
       
@@ -425,9 +555,28 @@ resource "google_cloud_run_v2_service" "notifications" {
       }
       
       ports { container_port = 8080 }
+      
+      startup_probe {
+        initial_delay_seconds = 10
+        timeout_seconds       = 10
+        period_seconds        = 5
+        failure_threshold     = 10
+        tcp_socket {
+          port = 8080
+        }
+      }
     }
   }
-  depends_on = [google_project_service.services]
+  depends_on = [
+    google_project_service.services,
+    google_pubsub_subscription.notifications_service,
+    google_pubsub_subscription.notifications_from_appointments,
+    google_pubsub_subscription.notifications_from_payments,
+    google_project_iam_member.runtime_pubsub_subscriber,
+    google_project_iam_member.runtime_pubsub_publisher,
+    google_project_iam_member.runtime_log_writer,
+    time_sleep.wait_for_iam_propagation
+  ]
 }
 
 # Allow public invocations for quick testing (no gateway yet)
