@@ -7,37 +7,37 @@
   "variable": [
     {
       "key": "auth_url",
-      "value": "https://auth-PROJECT_ID.run.app",
+      "value": "https://auth-npeev5arbq-uc.a.run.app",
       "type": "string"
     },
     {
       "key": "patients_url",
-      "value": "https://patients-PROJECT_ID.run.app",
+      "value": "https://patients-npeev5arbq-uc.a.run.app",
       "type": "string"
     },
     {
       "key": "doctors_url",
-      "value": "https://doctors-PROJECT_ID.run.app",
+      "value": "https://doctors-npeev5arbq-uc.a.run.app",
       "type": "string"
     },
     {
       "key": "appointments_url",
-      "value": "https://appointments-PROJECT_ID.run.app",
+      "value": "https://appointments-npeev5arbq-uc.a.run.app",
       "type": "string"
     },
     {
       "key": "payments_url",
-      "value": "https://payments-PROJECT_ID.run.app",
+      "value": "https://payments-npeev5arbq-uc.a.run.app",
       "type": "string"
     },
     {
       "key": "notifications_url",
-      "value": "https://notifications-PROJECT_ID.run.app",
+      "value": "https://notifications-npeev5arbq-uc.a.run.app",
       "type": "string"
     },
     {
       "key": "reporting_url",
-      "value": "https://reporting-PROJECT_ID.run.app",
+      "value": "https://reporting-npeev5arbq-uc.a.run.app",
       "type": "string"
     }
   ],
@@ -52,8 +52,12 @@
             "header": [],
             "url": {
               "raw": "{{auth_url}}/healthz",
-              "host": ["{{auth_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{auth_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             }
           },
           "response": []
@@ -65,8 +69,12 @@
             "header": [],
             "url": {
               "raw": "{{patients_url}}/healthz",
-              "host": ["{{patients_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{patients_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             }
           },
           "response": []
@@ -78,8 +86,12 @@
             "header": [],
             "url": {
               "raw": "{{doctors_url}}/healthz",
-              "host": ["{{doctors_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{doctors_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             }
           },
           "response": []
@@ -91,8 +103,12 @@
             "header": [],
             "url": {
               "raw": "{{appointments_url}}/healthz",
-              "host": ["{{appointments_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{appointments_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             }
           },
           "response": []
@@ -104,8 +120,12 @@
             "header": [],
             "url": {
               "raw": "{{payments_url}}/healthz",
-              "host": ["{{payments_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{payments_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             }
           },
           "response": []
@@ -117,8 +137,12 @@
             "header": [],
             "url": {
               "raw": "{{notifications_url}}/healthz",
-              "host": ["{{notifications_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{notifications_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             }
           },
           "response": []
@@ -163,8 +187,12 @@
             },
             "url": {
               "raw": "{{appointments_url}}/appointments",
-              "host": ["{{appointments_url}}"],
-              "path": ["appointments"]
+              "host": [
+                "{{appointments_url}}"
+              ],
+              "path": [
+                "appointments"
+              ]
             },
             "description": "Creates a new medical appointment. This will trigger an event in the appointments topic."
           },
@@ -215,8 +243,12 @@
             },
             "url": {
               "raw": "{{payments_url}}/payments",
-              "host": ["{{payments_url}}"],
-              "path": ["payments"]
+              "host": [
+                "{{payments_url}}"
+              ],
+              "path": [
+                "payments"
+              ]
             },
             "description": "Processes payment for the appointment. This will trigger a payment.completed event."
           },
@@ -229,8 +261,12 @@
             "header": [],
             "url": {
               "raw": "{{notifications_url}}/healthz",
-              "host": ["{{notifications_url}}"],
-              "path": ["healthz"]
+              "host": [
+                "{{notifications_url}}"
+              ],
+              "path": [
+                "healthz"
+              ]
             },
             "description": "The notifications service runs as a background subscriber. Check Cloud Logging to see notification events being processed.\n\nGo to: https://console.cloud.google.com/logs/query?project=proyecto-cloud-native\n\nSearch for: resource.labels.service_name=\"notifications\""
           },
@@ -258,8 +294,12 @@
             },
             "url": {
               "raw": "{{appointments_url}}/appointments",
-              "host": ["{{appointments_url}}"],
-              "path": ["appointments"]
+              "host": [
+                "{{appointments_url}}"
+              ],
+              "path": [
+                "appointments"
+              ]
             },
             "description": "Run this request multiple times to simulate load and test Pub/Sub message throughput"
           },
